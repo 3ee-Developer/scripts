@@ -7,15 +7,14 @@ function shutdownUniswap() {
 	for proc in $PROCESS; do
 		check=$(ps awx | grep "$proc" | grep -v grep)
 		if [ "$check" != "" ]; then
-			echo "(task) $proc corriendo"
+			echo "(uniswap) $proc corriendo"
 			sleep 30
-			shutdownTask
+			shutdownUniswap
 		fi
 	done
-	# 3ee_tasks
-	echo "--- Apagando 3ee_tasks ---"
+	# 3ee_uniswap
+	echo "--- Apagando 3ee_uniswap ---"
 	ps awx
-	#shutdown -h now
 	aws ec2 stop-instances --instance-ids i-042ec3e7fa3906e4b
 
 }
