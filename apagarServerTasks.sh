@@ -1,7 +1,7 @@
 #!/bin/bash
 
 IFS=' '
-PROCESS="aws_run.py valuation_uniswap.py valuation_hyperliquid.py valuation_hyperliquid_test.py"
+PROCESS="aws_run.py valuation_uniswap.py valuation_hyperliquid.py"
 
 function shutdownTasks() {
 	for proc in $PROCESS; do
