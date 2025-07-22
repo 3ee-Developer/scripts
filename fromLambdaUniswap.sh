@@ -7,7 +7,7 @@ LOG=/root/log/fromLambda.log
 LASTRUN=$(cat $LASTRUN_FILE)
 if [ "$DATE" == "$LASTRUN" ]; then
 	echo "Ya corrio! $(date)" >> $LOG
-  ##nohup /root/scripts/apagarServerUniswap.sh >> /root/log/apagarServerUniswap.log 2>&1 &
+  nohup /root/scripts/apagarServerUniswap.sh >> /root/log/apagarServerUniswap.log 2>&1 &
 	exit 0
 fi
 echo $DATE > $LASTRUN_FILE
