@@ -1,7 +1,7 @@
 #!/bin/bash
 
 IFS=' '
-PROCESS="valuation_hyperliquid.py"
+PROCESS="valuation_hyperliquid_evolution.py"
 
 function shutdownHyperliquid() {
 	for proc in $PROCESS; do
@@ -12,10 +12,9 @@ function shutdownHyperliquid() {
 			shutdownHyperliquid
 		fi
 	done
-	# 3ee_hyperliquid
 	echo "--- Apagando 3ee_hyperliquid ---"
 	ps awx
-	aws ec2 stop-instances --instance-ids i-09a4ecb38ca786bc5
+	##aws ec2 stop-instances --instance-ids i-09a4ecb38ca786bc5
 }
 
 echo $(date)
