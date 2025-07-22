@@ -12,7 +12,7 @@ function shutdownUniswap() {
 			shutdownUniswap
 		fi
 	done
-	echo "--- Apagando 3ee_uniswap ---"
+	echo "--- $(date) Apagando 3ee_uniswap ---"
 	ps awx
 	aws ec2 stop-instances --instance-ids i-042ec3e7fa3906e4b
 

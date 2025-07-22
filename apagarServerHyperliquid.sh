@@ -12,7 +12,7 @@ function shutdownHyperliquid() {
 			shutdownHyperliquid
 		fi
 	done
-	echo "--- Apagando 3ee_hyperliquid ---"
+	echo "--- $(date) Apagando 3ee_hyperliquid ---"
 	ps awx
 	aws ec2 stop-instances --instance-ids i-09a4ecb38ca786bc5
 }

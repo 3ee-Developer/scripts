@@ -13,7 +13,7 @@ function shutdownTasks() {
 		fi
 	done
 	# 3ee_tasks
-	echo "--- Apagando 3ee_tasks ---"
+	echo "--- $(date) Apagando 3ee_tasks ---"
 	ps awx
 	aws ec2 stop-instances --instance-ids i-086cd22c6d66f5cab
 
