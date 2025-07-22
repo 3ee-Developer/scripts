@@ -15,7 +15,7 @@ function shutdownTasks() {
 	# 3ee_tasks
 	echo "--- Apagando 3ee_tasks ---"
 	ps awx
-	##aws ec2 stop-instances --instance-ids i-086cd22c6d66f5cab
+	aws ec2 stop-instances --instance-ids i-086cd22c6d66f5cab
 
 }
 
