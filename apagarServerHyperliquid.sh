@@ -18,5 +18,5 @@ function shutdownHyperliquid() {
 }
 
 echo $(date)
-sleep 60
+sleep 900
 shutdownHyperliquid

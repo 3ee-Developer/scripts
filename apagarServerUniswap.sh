@@ -19,5 +19,5 @@ function shutdownUniswap() {
 }
 
 echo $(date)
-sleep 60
+sleep 300
 shutdownUniswap
