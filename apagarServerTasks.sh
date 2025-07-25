@@ -20,4 +20,5 @@ function shutdownTasks() {
 }
 
 echo $(date)
+sleep 60
 shutdownTasks

@@ -7,7 +7,7 @@ function shutdownHyperliquid() {
 	for proc in $PROCESS; do
 		check=$(ps awx | grep "$proc" | grep -v grep)
 		if [ "$check" != "" ]; then
-			echo "(task) $proc corriendo"
+			echo "(hyperliquid) $proc corriendo"
 			sleep 30
 			shutdownHyperliquid
 		fi
@@ -18,4 +18,5 @@ function shutdownHyperliquid() {
 }
 
 echo $(date)
+sleep 60
 shutdownHyperliquid
