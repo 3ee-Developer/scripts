@@ -4,6 +4,7 @@ IFS=' '
 PROCESS="valuation_hyperliquid_evolution.py"
 
 function shutdownHyperliquid() {
+	source venv/bin/activate && python3 monitor.py && deactivate
 	for proc in $PROCESS; do
 		check=$(ps awx | grep "$proc" | grep -v grep)
 		if [ "$check" != "" ]; then
@@ -18,5 +19,6 @@ function shutdownHyperliquid() {
 }
 
 echo $(date)
+# 15 minutos
 sleep 900
 shutdownHyperliquid

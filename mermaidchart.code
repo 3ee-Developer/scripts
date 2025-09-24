@@ -1,0 +1,50 @@
+flowchart TD
+    A["Inicio Lambda"] --> B["Iniciar instancias EC2"]
+    B --> B1["Iniciar tasks_vm<br/>i-086cd22c6d66f5cab"]
+    B --> B2["Iniciar hyperliquid_vm<br/>i-09a4ecb38ca786bc5"]
+    B --> B3["Iniciar uniswap_vm<br/>i-042ec3e7fa3906e4b"]
+    B --> B4["Iniciar api_signer_vm<br/>i-01993d9e57b195144"]
+    
+    B1 --> C1["Esperar tasks_vm running"]
+    B2 --> C2["Esperar hyperliquid_vm running"]
+    B3 --> C3["Esperar uniswap_vm running"]
+    B4 --> C4["Esperar api_signer_vm running"]
+    
+    C1 & C2 & C3 & C4 --> D["Ejecutar /root/scripts/fromLambda.sh<br/>en cada instancia de trabajo"]
+
+    %% Instancia tasks_vm
+    D --> E1["tasks_vm: Ya corrio hoy?<br/>Verificar /root/log/fromLambdaLastRun.log"]
+    E1 -->|Si| F1["Ejecutar apagarServerTasks.sh<br/>Monitorear: aws_run.py, valuate_and-run"]
+    E1 -->|No| G1["Ejecutar en background:<br/>backoffice.sh (aws_run.py)<br/>uniswap2.sh (valuate-and-run.py uniswap2)<br/>hyperliquid.sh (valuate-and-run.py hyperliquid)<br/>shield.sh (valuate-and-run.py damm)"]
+    G1 --> H1["Esperar 15min + Monitorear procesos<br/>Apagar tasks_vm"]
+
+    %% Instancia hyperliquid_vm
+    D --> E2["hyperliquid_vm: Ya corrio hoy?<br/>Verificar /root/log/fromLambdaLastRun.log"]
+    E2 -->|Si| F2["Ejecutar apagarServerHyperliquid.sh<br/>Monitorear: valuation_hyperliquid_evolution.py"]
+    E2 -->|No| G2["Ejecutar en background:<br/>hyperliquid_evolution.sh<br/>(valuation_hyperliquid_evolution.py)"]
+    G2 --> H2["Esperar 15min + Monitorear procesos<br/>Apagar hyperliquid_vm"]
+
+    %% Instancia uniswap_vm
+    D --> E3["uniswap_vm: Ya corrio hoy?<br/>Verificar /root/log/fromLambdaLastRun.log"]
+    E3 -->|Si| F3["Ejecutar apagarServerUniswap.sh<br/>Monitorear: uni_main.py"]
+    E3 -->|No| G3["Ejecutar en background:<br/>uniswap.sh (uni_main.py)"]
+    G3 --> H3["Esperar 5min + Monitorear procesos<br/>Apagar uniswap_vm"]
+
+    %% Espera y apagado final
+    F1 & H1 & F2 & H2 & F3 & H3 --> I["Lambda espera a que todas las<br/>instancias de trabajo se detengan"]
+    I --> J["Apagar api_signer_vm"]
+    J --> K["Fin del proceso"]
+
+    %% Estilos
+    classDef lambdaNode fill:#ff9999,stroke:#333,stroke-width:2px
+    classDef ec2Node fill:#99ccff,stroke:#333,stroke-width:2px
+    classDef processNode fill:#99ff99,stroke:#333,stroke-width:2px
+    classDef decisionNode fill:#ffcc99,stroke:#333,stroke-width:2px
+    classDef endNode fill:#cc99ff,stroke:#333,stroke-width:2px
+
+    class A,I,J,K lambdaNode
+    class B1,B2,B3,B4,C1,C2,C3,C4 ec2Node
+    class G1,G2,G3,H1,H2,H3 processNode
+    class E1,E2,E3 decisionNode
+    class F1,F2,F3 endNode
+

@@ -1,9 +1,10 @@
 #!/bin/bash
 
 IFS=' '
-PROCESS="aws_run.py valuation_uniswap.py valuation_hyperliquid.py"
+PROCESS="aws_run.py valuate_and-run"
 
 function shutdownTasks() {
+	source venv/bin/activate && python3 monitor.py && deactivate
 	for proc in $PROCESS; do
 		check=$(ps awx | grep "$proc" | grep -v grep)
 		if [ "$check" != "" ]; then
