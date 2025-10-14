@@ -1,7 +1,7 @@
 #!/bin/bash
 
 IFS=' '
-PROCESS="valuation_hyperliquid_evolution.py"
+PROCESS="valuate-and-run"
 
 function shutdownHyperliquid() {
 	for proc in $PROCESS; do
