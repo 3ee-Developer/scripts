@@ -1,7 +1,7 @@
 #!/bin/bash
 
 IFS=' '
-PROCESS="valuation_hyperliquid_evolution.py"
+PROCESS="valuate-and-run"
 
 function shutdownHyperliquid() {
 	source venv/bin/activate && python3 monitor.py && deactivate
