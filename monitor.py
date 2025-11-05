@@ -4,16 +4,24 @@ import os
 import socket
 import subprocess
 import re
-# Import WebClient from Python SDK (github.com/slackapi/python-slack-sdk)
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+from dotenv import load_dotenv
 import boto3
 from datetime import datetime
 import time
 
+# Cargar variables desde archivo .env si existe
+load_dotenv()
+
+# Obtener el token de Slack desde variables de entorno
+slack_token = os.getenv('SLACK_TOKEN')
+if not slack_token:
+	raise ValueError("SLACK_TOKEN no está definido en las variables de entorno. Por favor, configúralo en un archivo .env o como variable de entorno del sistema.")
+
 # WebClient instantiates a client that can call API methods
 # When using Bolt, you can use either `app.client` or the `client` passed to listeners.
-client = WebClient(token="")
+client = WebClient(token=slack_token)
 logger = logging.getLogger(__name__)
 
 # Canal de Slack para errores
