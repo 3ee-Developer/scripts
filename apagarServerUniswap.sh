@@ -4,7 +4,7 @@ IFS=' '
 PROCESS="uni_main.py"
 
 function shutdownUniswap() {
-	source venv/bin/activate && python3 monitor.py && deactivate
+	cd /root/scripts && source venv/bin/activate && python3 monitor.py && deactivate && cd -
 	for proc in $PROCESS; do
 		check=$(ps awx | grep "$proc" | grep -v grep)
 		if [ "$check" != "" ]; then
