@@ -48,6 +48,34 @@ fireblocks_cosigner_vm = 'i-01993d9e57b195144'
 ssm_client = boto3.client('ssm')
 ec2_client = boto3.client('ec2')
 
+# Archivo para persistir el último contenido enviado por cada archivo de log
+LAST_SENT_LOGS_FILE = "last_sent_logs.json"
+
+def load_last_sent_logs():
+	"""
+	Carga el diccionario de últimos logs enviados desde el archivo JSON.
+	"""
+	try:
+		if os.path.exists(LAST_SENT_LOGS_FILE):
+			with open(LAST_SENT_LOGS_FILE, 'r', encoding='utf-8') as f:
+				return json.load(f)
+	except Exception as e:
+		print(f"Error cargando last_sent_logs: {e}")
+	return {}
+
+def save_last_sent_logs(logs_dict):
+	"""
+	Guarda el diccionario de últimos logs enviados en el archivo JSON.
+	"""
+	try:
+		with open(LAST_SENT_LOGS_FILE, 'w', encoding='utf-8') as f:
+			json.dump(logs_dict, f, indent=2, ensure_ascii=False)
+	except Exception as e:
+		print(f"Error guardando last_sent_logs: {e}")
+
+# Diccionario para almacenar el último contenido enviado por cada archivo de log
+last_sent_logs = load_last_sent_logs()
+
 first_message = True
 def sendSlackMsg(msg=None, blocks=None):
 	global first_message
@@ -78,6 +106,7 @@ def send_logs():
 	global hostname
 	global str_current_datetime
 	global root_path
+	global last_sent_logs
 	
 	script_path = f"{root_path}/scripts/fromLambda.sh"
 	log_files = []
@@ -147,6 +176,16 @@ def send_logs():
 					
 					if result.returncode == 0:
 						last_lines = result.stdout.strip()
+						# Verificar si el contenido es el mismo que el último enviado
+						if log_file in last_sent_logs and last_sent_logs[log_file] == last_lines:
+							# El contenido es el mismo, no enviar
+							continue
+						
+						# Actualizar el último contenido enviado
+						last_sent_logs[log_file] = last_lines
+						# Guardar en disco para persistir entre ejecuciones
+						save_last_sent_logs(last_sent_logs)
+						
 						# Enviar header con el nombre del archivo
 						sendSlackMsg(f"{str_current_datetime} {hostname} - Log: {log_file}")
 						# Enviar las últimas líneas
