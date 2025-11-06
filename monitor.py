@@ -8,7 +8,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from dotenv import load_dotenv
 import boto3
-from datetime import datetime
+from datetime import datetime, timezone
 import time
 
 # Cargar variables desde archivo .env si existe
@@ -37,7 +37,7 @@ else:
 	root_path = "/root"
 
 # Hora actual en UTC
-current_datetime = datetime.utcnow()
+current_datetime = datetime.now(timezone.utc)
 str_current_datetime = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
 # ID de la instancia de la API Signer
