@@ -162,6 +162,11 @@ def send_logs():
 						log_files.append(log_file)
 		
 		# Para cada archivo .log encontrado, leer las últimas 10 líneas
+		log_files.append('/root/defilib/logs/uniswap.log')
+		log_files.append('/root/defilib/logs/uniswap2.log')
+		log_files.append('/root/defilib/logs/hyperliquid.log')
+		log_files.append('/root/defilib/logs/hyperliquid2.log')
+		log_files.append('/root/defilib/logs/damm.log')
 		for log_file in log_files:
 			try:
 				if os.path.exists(log_file):
