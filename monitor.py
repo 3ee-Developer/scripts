@@ -51,6 +51,9 @@ ec2_client = boto3.client('ec2')
 # Archivo para persistir el último contenido enviado por cada archivo de log
 LAST_SENT_LOGS_FILE = "last_sent_logs.json"
 
+# Archivo para persistir la última fecha de ejecución de check_disk_space
+LAST_DISK_CHECK_FILE = "last_disk_check.json"
+
 def load_last_sent_logs():
 	"""
 	Carga el diccionario de últimos logs enviados desde el archivo JSON.
@@ -72,6 +75,30 @@ def save_last_sent_logs(logs_dict):
 			json.dump(logs_dict, f, indent=2, ensure_ascii=False)
 	except Exception as e:
 		print(f"Error guardando last_sent_logs: {e}")
+
+def load_last_disk_check_date():
+	"""
+	Carga la última fecha de ejecución de check_disk_space desde el archivo JSON.
+	Retorna None si no existe el archivo o hay un error.
+	"""
+	try:
+		if os.path.exists(LAST_DISK_CHECK_FILE):
+			with open(LAST_DISK_CHECK_FILE, 'r', encoding='utf-8') as f:
+				data = json.load(f)
+				return data.get('last_check_date')
+	except Exception as e:
+		print(f"Error cargando last_disk_check: {e}")
+	return None
+
+def save_last_disk_check_date(date_str):
+	"""
+	Guarda la última fecha de ejecución de check_disk_space en el archivo JSON.
+	"""
+	try:
+		with open(LAST_DISK_CHECK_FILE, 'w', encoding='utf-8') as f:
+			json.dump({'last_check_date': date_str}, f, indent=2, ensure_ascii=False)
+	except Exception as e:
+		print(f"Error guardando last_disk_check: {e}")
 
 # Diccionario para almacenar el último contenido enviado por cada archivo de log
 last_sent_logs = load_last_sent_logs()
@@ -233,8 +260,8 @@ def send_logs():
 							sendSlackMsg("(archivo vacío)")
 					else:
 						sendSlackMsg(f"{str_current_datetime} {hostname} - Error leyendo {log_file}: {result.stderr}")
-				else:
-					sendSlackMsg(f"{str_current_datetime} {hostname} - Archivo no encontrado: {log_file}")
+				#else:
+				#	sendSlackMsg(f"{str_current_datetime} {hostname} - Archivo no encontrado: {log_file}")
 			except Exception as e:
 				sendSlackMsg(f"{str_current_datetime} {hostname} - Error procesando {log_file}: {str(e)}")
 		
@@ -246,6 +273,15 @@ def send_logs():
 
 
 def check_disk_space(threshold_percent=80):
+	# Obtener la fecha actual en formato YYYY-MM-DD
+	current_date = current_datetime.strftime("%Y-%m-%d")
+	
+	# Verificar si ya se ejecutó hoy
+	last_check_date = load_last_disk_check_date()
+	if last_check_date == current_date:
+		# Ya se ejecutó hoy, salir sin hacer nada
+		return None
+	
 	try:
 		# Ejecutar comando df -h para obtener información del disco local
 		# Usando df -h / para obtener el disco raíz
@@ -288,6 +324,9 @@ def check_disk_space(threshold_percent=80):
 					   f"(Usado: {used}, Disponible: {avail}, Total: {size})")
 				sendSlackMsg(msg)
 			
+			# Guardar la fecha de ejecución exitosa
+			save_last_disk_check_date(current_date)
+			
 			return disk_info
 		else:
 			print(f"No se pudo parsear el resultado del comando: {output}")
@@ -302,14 +341,14 @@ def check_disk_space(threshold_percent=80):
 		return None
 
 
-def check_after_0030():
+def check_after_0015():
 	global hostname
 	global current_datetime
 	global str_current_datetime
 
 	current_hour = current_datetime.hour
 	current_minute = current_datetime.minute
-	if current_hour > 0 or (current_hour == 0 and current_minute > 30):
+	if current_hour > 0 or (current_hour == 0 and current_minute > 15):
 		sendSlackMsg(f"{str_current_datetime} {hostname} Sigue prendido")
 		if cosigner_running():
 			sendSlackMsg(f"{str_current_datetime} Fireblocks-CoSigner sigue prendido")
@@ -320,7 +359,7 @@ def main():
 	# Chequear el espacio en disco
 	check_disk_space(threshold_percent=80)
 	# Envia mensaje de que sigue prendida despues de las 00:30 UTC
-	check_after_0030()
+	check_after_0015()
 
 
 if __name__ == "__main__":

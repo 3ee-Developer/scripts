@@ -1,25 +1,12 @@
 #!/bin/bash
 
-IFS=' '
+# Cargar función común de shutdown
+source "$(dirname "$0")/shutdown_common.sh"
+
 PROCESS="aws_run.py valuate-and-run"
-
-function shutdownTasks() {
-	cd /root/scripts && source venv/bin/activate && python3 monitor.py && deactivate && cd -
-	for proc in $PROCESS; do
-		check=$(ps awx | grep "$proc" | grep -v grep)
-		if [ "$check" != "" ]; then
-			echo "(tasks) $proc corriendo"
-			sleep 30
-			shutdownTasks
-		fi
-	done
-	# 3ee_tasks
-	echo "--- $(date) Apagando 3ee_tasks ---"
-	ps awx
-	aws ec2 stop-instances --instance-ids i-086cd22c6d66f5cab
-
-}
+INSTANCE_ID="i-086cd22c6d66f5cab"
+SERVER_NAME="3ee_tasks"
 
 echo $(date)
 sleep 900
-shutdownTasks
+shutdownServer "$PROCESS" "$INSTANCE_ID" "$SERVER_NAME"
