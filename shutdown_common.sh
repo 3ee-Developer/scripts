@@ -12,7 +12,7 @@ function shutdownServer() {
 	local SERVER_NAME="${3:-server}"
 	
 	IFS=' '
-	
+
 	# Monitor
 	echo "Monitoring server..."
 	cd /root/scripts && source venv/bin/activate && python3 monitor.py && deactivate && cd -
@@ -32,7 +32,11 @@ function shutdownServer() {
 			# Todos los procesos terminaron
 			break
 		fi
-		sleep 30
+		sleep 60
+
+		# Monitor
+		echo "Monitoring server..."
+		cd /root/scripts && source venv/bin/activate && python3 monitor.py && deactivate && cd -
 	done
 	
 	# Upload gsheet

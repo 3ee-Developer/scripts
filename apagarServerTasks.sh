@@ -8,5 +8,4 @@ INSTANCE_ID="i-086cd22c6d66f5cab"
 SERVER_NAME="3ee_tasks"
 
 echo $(date)
-sleep 900
 shutdownServer "$PROCESS" "$INSTANCE_ID" "$SERVER_NAME"
