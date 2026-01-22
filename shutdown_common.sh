@@ -40,9 +40,10 @@ function shutdownServer() {
 	done
 	
 	# Upload gsheet
+	cd /root/defilib && source venv2/bin/activate
 	while true; do
 		echo "Uploading gsheet..."
-		cd /root/defilib && source venv2/bin/activate && python3 scripts/backoffice/upload_gsheet.py && cd -
+		python3 scripts/backoffice/upload_gsheet.py
 		if [ $? -eq 0 ]; then
 			echo "Upload gsheet success"
 			break
