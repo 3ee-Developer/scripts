@@ -53,7 +53,8 @@ function shutdownServer() {
 	
 	# Shutdown
 	echo "--- $(date) Apagando $SERVER_NAME ---"
-	ps awx
-	aws ec2 stop-instances --instance-ids $INSTANCE_ID
+	shutdown -h now
+	#ps awx
+	#aws ec2 stop-instances --instance-ids $INSTANCE_ID
 }
 

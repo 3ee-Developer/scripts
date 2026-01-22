@@ -22,17 +22,15 @@ check_instance_state() {
         --output text 2>/dev/null
 }
 
-# Esperar hasta que ambas instancias estén en estado "stopped"
-echo "$(date) - Esperando que las instancias $CHECK_UNISWAP_SERVER y $CHECK_HYPERLIQUID_SERVER estén detenidas..."
+# Esperar hasta que la instancia esté en estado "stopped"
+echo "$(date) - Esperando que la instancia $CHECK_UNISWAP_SERVER esté detenida..."
 while true; do
     state1=$(check_instance_state "$CHECK_UNISWAP_SERVER")
-    state2=$(check_instance_state "$CHECK_HYPERLIQUID_SERVER")
     
     echo "$(date) - Estado de $CHECK_UNISWAP_SERVER: $state1"
-    echo "$(date) - Estado de $CHECK_HYPERLIQUID_SERVER: $state2"
     
-    if [ "$state1" = "stopped" ] && [ "$state2" = "stopped" ]; then
-        echo "$(date) - Ambas instancias están detenidas. Procediendo a apagar el servidor..."
+    if [ "$state1" = "stopped" ]; then
+        echo "$(date) - La instancia está detenida. Procediendo a apagar el servidor..."
         break
     fi
     
