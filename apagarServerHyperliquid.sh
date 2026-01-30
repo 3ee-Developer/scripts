@@ -9,5 +9,4 @@ SERVER_NAME="3ee_hyperliquid"
 
 echo $(date)
 # 15 minutos
-sleep 900
 shutdownServer "$PROCESS" "$INSTANCE_ID" "$SERVER_NAME"

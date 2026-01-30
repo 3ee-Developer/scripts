@@ -8,5 +8,4 @@ INSTANCE_ID="i-042ec3e7fa3906e4b"
 SERVER_NAME="3ee_uniswap"
 
 echo $(date)
-sleep 300
 shutdownServer "$PROCESS" "$INSTANCE_ID" "$SERVER_NAME"
