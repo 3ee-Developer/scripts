@@ -49,7 +49,7 @@ function shutdownServer() {
 			break
 		fi
 		echo "Upload gsheet failed"
-		sleep 10
+		sleep 60
 	done
 	
 	# Shutdown
