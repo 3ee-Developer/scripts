@@ -3,7 +3,6 @@ import json
 import os
 import socket
 import subprocess
-import re
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from dotenv import load_dotenv
@@ -35,6 +34,28 @@ if hostname == "MacBookPro.fibertel.com.ar":
 	root_path = "/Users/mconsoni/Work/3ee/scripts/sample"
 else:
 	root_path = "/root"
+
+# Logs a enviar por hostname (el hostname puede ser exacto o contener la clave, ej. "ip-xxx-tasks" -> tasks)
+# Completar las listas con los archivos de log de cada servidor. Rutas típicas en servidor: /root/...
+LOG_FILES_BY_HOSTNAME = {
+	"tasks": [
+		"/root/log/apagarServerTasks.log",
+		"/root/log/backoffice.log",
+		"/root/log/hyperliquid_strategy.log",
+		"/root/log/hyperliquid_valuation.log",
+		"/root/log/shield.log",
+		"/root/log/uniswap2.log",
+	],
+	"hyperliquid": [
+		"/root/log/hyperliquid_evolution.log",
+		"/root/log/apagarServerHyperliquid.log",
+		"/root/defilib/logs/hyperliquid2.log",
+	],
+	"uniswap": [
+		"/root/log/apagarServerUniswap.log",
+		"/root/defilib/logs/uniswap.log",
+	],
+}
 
 # Hora actual en UTC
 current_datetime = datetime.now(timezone.utc)
@@ -127,79 +148,38 @@ def cosigner_running():
 
 def send_logs():
 	"""
-	Busca archivos .log en {root_path}/scripts/fromLambda.sh que no estén comentados
-	y envía las últimas 10 líneas de cada archivo por Slack.
+	Envía las últimas líneas de los archivos de log configurados para este hostname.
+	Usa LOG_FILES_BY_HOSTNAME: si el hostname coincide exactamente o contiene la clave (tasks, hyperliquid, uniswap),
+	se envían los logs de esa entrada.
 	"""
 	global hostname
 	global str_current_datetime
 	global root_path
 	global last_sent_logs
 	
-	script_path = f"{root_path}/scripts/fromLambda.sh"
-	log_files = []
+	# Resolver lista de logs según hostname: coincidencia exacta o hostname contiene la clave
+	log_files = LOG_FILES_BY_HOSTNAME.get(hostname)
+	if log_files is None:
+		for key in LOG_FILES_BY_HOSTNAME:
+			if key in hostname:
+				log_files = LOG_FILES_BY_HOSTNAME[key]
+				break
+	if not log_files:
+		return
+	
+	# Sustituir /root por root_path por si se ejecuta en otro entorno (ej. local)
+	resolved = []
+	for p in log_files:
+		resolved.append(p.replace("/root", root_path) if p.startswith("/root") else p)
+	log_files = resolved
 	
 	try:
-		# Leer el archivo fromLambda.sh
-		with open(script_path, 'r') as f:
-			lines = f.readlines()
-		
-		# Primero, buscar definiciones de variables que contengan .log (ej: LOG={root_path}/log/fromLambda.log)
-		variables = {}
-		var_pattern = re.compile(r'^(\w+)=([^\s#]+\.log)')
-		for line in lines:
-			stripped_line = line.strip()
-			if stripped_line.startswith('#'):
-				continue
-			match = var_pattern.match(stripped_line)
-			if match:
-				var_name = match.group(1)
-				var_value = match.group(2).strip()
-				variables[var_name] = var_value
-		
-		# Buscar líneas que contengan .log y que no estén comentadas
-		# Patrón para encontrar archivos .log: >> {root_path}/log/archivo.log o >> $VARIABLE
-		log_pattern = re.compile(r'>>\s+([^\s&]+)')
-		
-		for line in lines:
-			# Saltar líneas comentadas (que empiezan con #)
-			stripped_line = line.strip()
-			if stripped_line.startswith('#'):
-				continue
-			
-			# Buscar archivos .log en la línea
-			matches = log_pattern.findall(line)
-			for match in matches:
-				log_file = match.strip()
-				# Si es una variable como $LOG, expandirla
-				if log_file.startswith('$'):
-					var_name = log_file[1:].split('.')[0]  # Extraer nombre de variable
-					if var_name in variables:
-						log_file = variables[var_name]
-					else:
-						continue  # Variable no definida, saltar
-				# Reemplazar /root con root_path en la ruta del archivo
-				if '/root' in log_file:
-					log_file = log_file.replace('/root', root_path)
-				# Verificar que termine en .log y excluir ciertos archivos
-				if log_file.endswith('.log') and log_file not in log_files:
-					# Obtener solo el nombre del archivo (sin la ruta)
-					file_name = os.path.basename(log_file)
-					# Excluir fromLambda.log y archivos que empiecen con apagarServer
-					if not log_file.endswith('fromLambda.log') and not file_name.startswith('apagarServer'):
-						log_files.append(log_file)
-		
-		# Para cada archivo .log encontrado, leer las últimas 10 líneas
-		log_files.append('/root/defilib/logs/uniswap.log')
-		log_files.append('/root/defilib/logs/uniswap2.log')
-		log_files.append('/root/defilib/logs/hyperliquid.log')
-		log_files.append('/root/defilib/logs/hyperliquid2.log')
-		log_files.append('/root/defilib/logs/damm.log')
 		for log_file in log_files:
 			try:
 				if os.path.exists(log_file):
 					# Leer las últimas 10 líneas del archivo
 					result = subprocess.run(
-						f"tail -n 20 {log_file}",
+						f"tail -n 3 {log_file}",
 						shell=True,
 						capture_output=True,
 						text=True,
@@ -264,9 +244,6 @@ def send_logs():
 				#	sendSlackMsg(f"{str_current_datetime} {hostname} - Archivo no encontrado: {log_file}")
 			except Exception as e:
 				sendSlackMsg(f"{str_current_datetime} {hostname} - Error procesando {log_file}: {str(e)}")
-		
-	except FileNotFoundError:
-		sendSlackMsg(f"{str_current_datetime} {hostname} - Archivo no encontrado: {script_path}")
 	except Exception as e:
 		sendSlackMsg(f"{str_current_datetime} {hostname} - Error en send_logs: {str(e)}")
 	
