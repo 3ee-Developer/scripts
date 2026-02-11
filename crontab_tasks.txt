@@ -24,6 +24,6 @@
 56 23 * * * time /root/scripts/hyperliquid_strategy.sh >> /root/log/hyperliquid_strategy.log 2>&1
 0 0 * * * time /root/scripts/hyperliquid_valuation.sh >> /root/log/hyperliquid_valuation.log 2>&1
 0 0 * * * time /root/scripts/backoffice.sh >> /root/log/backoffice.log 2>&1
-0 0 * * * time /root/scripts/uniswap2.sh >> /root/log/uniswap2.log 2>&1
-0 0 * * * time /root/scripts/shield.sh >> /root/log/shield.log 2>&1
+#0 0 * * * time /root/scripts/uniswap2.sh >> /root/log/uniswap2.log 2>&1
+#0 0 * * * time /root/scripts/shield.sh >> /root/log/shield.log 2>&1
 0 15 * * * /root/scripts/apagarServerTasks.sh >> /root/log/apagarServerTasks.log 2>&1

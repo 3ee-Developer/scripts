@@ -21,6 +21,6 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 # 
 # m h  dom mon dow   command
-0 0 * * * time /root/scripts/uniswap.sh >> /root/log/uniswap.log 2>&1
-0 15 * * * /root/scripts/apagarServerUniswap.sh >> /root/log/apagarServerUniswap.log 2>&1
+0 0 * * * time /root/scripts/strategy_crypto_fund.sh >> /root/log/strategy_crypto_fund.log 2>&1
+0 15 * * * /root/scripts/apagarServerStrategy.sh >> /root/log/apagarServerStrategy.log 2>&1
 
