@@ -327,8 +327,8 @@ def check_after_0015():
 	current_minute = current_datetime.minute
 	if current_hour > 0 or (current_hour == 0 and current_minute > 15):
 		sendSlackMsg(f"{str_current_datetime} {hostname} Sigue prendido")
-		if cosigner_running():
-			sendSlackMsg(f"{str_current_datetime} Fireblocks-CoSigner sigue prendido")
+		#if cosigner_running():
+		#	sendSlackMsg(f"{str_current_datetime} Fireblocks-CoSigner sigue prendido")
 		send_logs()
 
 

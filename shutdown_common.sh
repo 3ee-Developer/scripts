@@ -32,7 +32,7 @@ function shutdownServer() {
 			# Todos los procesos terminaron
 			break
 		fi
-		sleep 60
+		sleep 300
 
 		# Monitor
 		echo "Monitoring server..."
