@@ -32,25 +32,25 @@ function shutdownServer() {
 			# Todos los procesos terminaron
 			break
 		fi
-		sleep 60
+		sleep 300
 
 		# Monitor
 		echo "Monitoring server..."
 		cd /root/scripts && source venv/bin/activate && python3 monitor.py && deactivate && cd -
 	done
 	
-	# Upload gsheet
-	cd /root/defilib && source venv2/bin/activate
-	while true; do
-		echo "Uploading gsheet..."
-		python3 scripts/backoffice/upload_gsheet.py
-		if [ $? -eq 0 ]; then
-			echo "Upload gsheet success"
-			break
-		fi
-		echo "Upload gsheet failed"
-		sleep 60
-	done
+#	# Upload gsheet
+#	cd /root/defilib && source venv2/bin/activate
+#	while true; do
+#		echo "Uploading gsheet..."
+#		python3 scripts/backoffice/upload_gsheet.py
+#		if [ $? -eq 0 ]; then
+#			echo "Upload gsheet success"
+#			break
+#		fi
+#		echo "Upload gsheet failed"
+#		sleep 60
+#	done
 	
 	# Shutdown
 	echo "--- $(date) Apagando $SERVER_NAME ---"
