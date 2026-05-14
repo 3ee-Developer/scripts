@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-LOG="/root/log/3ee_systematic_vault.log"
 NO_VALUATE=0
 NO_STRATEGY=0
 FUND=""
@@ -47,6 +46,14 @@ if [[ -z "$FUND" ]]; then
   exit 2
 fi
 
+if [[ "$NO_VALUATE" -eq 1 && "$NO_STRATEGY" -eq 0 ]]; then
+  LOG="/root/log/${FUND}_strategy.log"
+elif [[ "$NO_VALUATE" -eq 0 && "$NO_STRATEGY" -eq 1 ]]; then
+  LOG="/root/log/${FUND}_valuation.log"
+else
+  LOG="/root/log/${FUND}.log"
+fi
+
 echo "--------------------------------------------------------------------------" >> "$LOG"
 echo "$(date)" >> "$LOG"
 
@@ -64,6 +71,6 @@ if [[ "$NO_STRATEGY" -eq 1 ]]; then
 fi
 
 cd /root/defilib && source venv2/bin/activate && \
-	python3 scripts/backoffice/valuate-and-run.py "${PY_ARGS[@]}" "$FUND" >> "$LOG" 2>&1  && \
+	python3 scripts/backoffice/valuate-and-run.py ${PY_ARGS[@]} "$FUND" >> "$LOG" 2>&1  && \
 	python3 scripts/backoffice/upload_gsheet.py --fund "$FUND" >> "$LOG" 2>&1  && \
 	deactivate >> "$LOG" 2>&1

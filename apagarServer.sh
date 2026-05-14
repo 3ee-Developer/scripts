@@ -3,7 +3,7 @@
 # Cargar función común de shutdown
 source "$(dirname "$0")/shutdown_common.sh"
 
-PROCESS="aws_run.py valuate-and-run"
+PROCESS="aws_run.py valuate-and-run upload_gsheet"
 INSTANCE_ID="-"
 SERVER_NAME=$1
 
