@@ -70,5 +70,5 @@ if [[ "$NO_STRATEGY" -eq 1 ]]; then PY_ARGS+=(--no-strategy); fi
 cd /root/defilib
 source venv2/bin/activate
 python3 scripts/backoffice/valuate-and-run.py "$FUND" "${PY_ARGS[@]}" >> "$LOG" 2>&1
-python3 scripts/backoffice/upload_gsheet.py --fund "$FUND" >> "$LOG" 2>&1
+python3 scripts/backoffice/upload_gsheet.py --fund "$FUND" "${PY_ARGS[@]}" >> "$LOG" 2>&1
 deactivate >> "$LOG" 2>&1
